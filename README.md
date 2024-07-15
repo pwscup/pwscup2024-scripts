@@ -31,11 +31,13 @@ pwscup2024-dev/
 ### スクリプトの実行
 #### 加工・評価の実行
 `/run.bash` は、
+
 - /scripts/anonymize/anomymize.pyの内容で加工して、
 - /scripts/evaluate/utilityScore0_progressbar.py の内容で評価する
+
 のを一貫して実行します。
 
-使い方：-hで表示されるヘルプをご参照ください
+使い方 -hで表示されるヘルプをご参照ください
 ```bash
 bash run.bash -h
 bash run.bash  <入力ファイルパス> <出力ファイルパス>
