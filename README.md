@@ -30,9 +30,9 @@ pwscup2024-dev/
 │   ├── anonymize/：加工スクリプト
 │   │   └── anonymize.py
 │   ├── evaluate/：評価スクリプト
-│   │   ├── utilityScore0.py
-│   │   └── utilityScore0_progressbar.py
+│   │   └── utilityScore0.py
 │   └── operation/：その他
+│   │   ├── checkCi.py
 │       └── checkhashvalue.py
 └── .gitignore
 ```
@@ -44,7 +44,9 @@ pwscup2024-dev/
 `/run.bash` は、
 
 - /scripts/anonymize/anomymize.py の内容で加工して、
+- /scripts/operation/checkCi.py の内容でデータ品質をチェックして、
 - /scripts/evaluate/utilityScore0_progressbar.py 等の内容で評価する
+
 
 処理を、一貫して実行します。
 
