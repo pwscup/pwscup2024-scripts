@@ -7,22 +7,24 @@
 
 ```
 pwscup2024-dev/
-├── data/
+├── README.md　：本ファイル
+├── run.bash　：加工・評価の一括実行用スクリプト
+├── data/　　　：データ置き場
 │   ├── raw/
 │   │   └── A.csv
-│   └── sample/
+│   ├── output/　：加工後ファイル置き場
+│   │   └── C.csv
+│   └── sample/　：加工前ファイル置き場
 │       └── sampleBi.csv
-├── scripts/
-│   ├── anonymize/
+├── scripts/　　　：スクリプト置き場
+│   ├── anonymize/：加工スクリプト
 │   │   └── anonymize.py
-│   ├── evaluate/
-│   │   ├── tmp.txt
+│   ├── evaluate/：評価スクリプト
 │   │   ├── utilityScore0.py
 │   │   └── utilityScore0_progressbar.py
-│   └── operation/
+│   └── operation/：その他
 │       └── checkhashvalue.py
-├── .gitignore
-└── README.md
+└── .gitignore
 ```
 
 ## 使用方法
@@ -31,18 +33,18 @@ pwscup2024-dev/
 #### 加工・評価の実行
 `/run.bash` は、
 
-- /scripts/anonymize/anomymize.pyの内容で加工して、
-- /scripts/evaluate/utilityScore0_progressbar.py の内容で評価する
+- /scripts/anonymize/anomymize.py の内容で加工して、
+- /scripts/evaluate/utilityScore0_progressbar.py 等の内容で評価する
 
-のを一貫して実行します。
+処理を、一貫して実行します。
 
-使い方 -hで表示されるヘルプをご参照ください
+使い方は、-hで表示されるヘルプをご参照ください
 ```bash
 bash run.bash -h
 bash run.bash  <入力ファイルパス> <出力ファイルパス>
 ```
 
-#### 匿名化スクリプト
+#### 加工の個別実行
 
 `anonymize.py` はデータを匿名化するためのスクリプトです。以下のコマンドで実行します：
 
@@ -50,7 +52,7 @@ bash run.bash  <入力ファイルパス> <出力ファイルパス>
 python3 scripts/anonymize/anonymize.py <入力ファイルパス> <出力ファイルパス>
 ```
 
-#### 評価スクリプト
+#### 評価の個別実行
 
 `utilityScore0_progressbar.py` はデータの有用性評価を行うスクリプトです。進行状況を表示するプログレスバー付きです。以下のコマンドで実行します：
 
