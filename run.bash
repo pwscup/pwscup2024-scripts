@@ -64,6 +64,8 @@ fi
 if [[ -z $ANON_ONLY && -z $EVALUATE_ONLY && -z $CHECK_ONLY ]]; then
   echo "加工を開始します。"
   python3 $dir/scripts/anonymize/anonymize.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
+  echo "チェックを開始します。"
+  python3 $dir/scripts/operation/checkCi.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
   echo "評価を開始します。"
   python3 $dir/scripts/evaluate/utilityScore0.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
 else
@@ -71,15 +73,16 @@ else
     echo "加工を開始します。"
     python3 $dir/scripts/anonymize/anonymize.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
   fi
+  
+  if [[ -n $CHECK_ONLY ]]; then
+    echo "チェックを開始します。"
+    python3 $dir/scripts/operation/checkCi.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
+  fi
 
   if [[ -n $EVALUATE_ONLY ]]; then
     echo "評価を開始します。"
     python3 $dir/scripts/evaluate/utilityScore0.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
   fi
 
-  if [[ -n $CHECK_ONLY ]]; then
-    echo "チェックを開始します。"
-    python3 $dir/scripts/operation/checkCi.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
-  fi
 fi
 

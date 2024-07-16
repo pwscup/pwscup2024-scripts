@@ -79,9 +79,45 @@ python3 scripts/evaluate/utilityScore0_progressbar.py <入力ファイルパス>
 ```bash
 python3 scripts/operation/checkhashvalue.py <入力ファイルパス>
 ```
+## 環境構築
+
+
+### 1. uvをインストールする
+まず、uvをインストールします。uvはPythonの仮想環境を管理するツールです。
+
+```bash
+pip install uv
+```
+
+### 2. uvでpythonの仮想環境を作成する
+次に、uvを使用してPythonの仮想環境を作成します。ここでは、仮想環境の名前を`venv`としています。
+
+```bash
+uv create venv
+```
+
+### 3. uvでpip installする（requirements.txtを参照して）
+仮想環境をアクティベートした後、requirements.txtファイルを参照して必要なパッケージをインストールします。
+
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+これで環境構築は完了です。
+
+仮想環境から抜ける際には、
+
+```bash
+deactivate
+```
+を実行してください。再度仮想環境を利用する場合は、
+```bash
+source .venv/bin/activate
+```
+を実行してください。
+
 
 ## その他
-### 環境構築
-- python3.12にて動作確認をしています。/requirements.txtの内容をpip installしてください
 - Linux環境にて動作確認をしています。
 - その他、プロジェクトに関する質問や問題がある場合は、slackにてお問い合わせください。
