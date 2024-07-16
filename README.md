@@ -69,9 +69,7 @@ python3 scripts/operation/checkhashvalue.py <入力ファイルパス>
 ```
 
 ## その他
-
-- `data/raw/` フォルダには生データが含まれています。
-- `data/sample/` フォルダにはサンプルデータが含まれています。
-- `.gitignore` ファイルには、Git で無視するファイルやディレクトリが指定されています。
-
-プロジェクトに関する質問や問題がある場合は、slackにてお問い合わせください。
+### 環境構築
+- python3.12にて動作確認をしています。/requirements.txtの内容をpip installしてください
+- Linux環境にて動作確認をしています。
+- その他、プロジェクトに関する質問や問題がある場合は、slackにてお問い合わせください。
