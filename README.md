@@ -47,13 +47,11 @@ pwscup2024-dev/
 - /scripts/operation/checkCi.py の内容でデータ品質をチェックして、
 - /scripts/evaluate/utilityScore0_progressbar.py 等の内容で評価する
 
-
 処理を、一貫して実行します。
 
 使い方は、-hで表示されるヘルプをご参照ください
 ```bash
 bash run.bash -h
-bash run.bash  <入力ファイルパス> <出力ファイルパス>
 ```
 
 ### 加工の個別実行
@@ -63,22 +61,40 @@ bash run.bash  <入力ファイルパス> <出力ファイルパス>
 ```bash
 python3 scripts/anonymize/anonymize.py <入力ファイルパス> <出力ファイルパス>
 ```
+または、
+
+```bash
+bash run.bash -a  <入力ファイルパス> <出力ファイルパス>
+```
+
 
 ### 評価の個別実行
 
 `utilityScore0_progressbar.py` はデータの有用性評価を行うスクリプトです。進行状況を表示するプログレスバー付きです。以下のコマンドで実行します：
 
 ```bash
-python3 scripts/evaluate/utilityScore0_progressbar.py <入力ファイルパス> <出力ファイルパス>
+python3 scripts/evaluate/utilityScore0.py <入力ファイルパス> <出力ファイルパス>
 ```
+または、
+
+```bash
+bash run.bash -e  <入力ファイルパス> <出力ファイルパス>
+```
+
 
 ### ハッシュ値チェックスクリプト
 
-`checkhashvalue.py` はファイルのハッシュ値をチェックするためのスクリプトです。以下のコマンドで実行します：
+`checkCi.py` 加工後データの値域が正しいことを確認するスクリプトです。以下のコマンドで実行します：
 
 ```bash
-python3 scripts/operation/checkhashvalue.py <入力ファイルパス>
+python3 scripts/operation/checkCi.py <入力ファイルパス> <出力ファイルパス>
 ```
+または、
+
+```bash
+bash run.bash -c  <入力ファイルパス> <出力ファイルパス>
+```
+
 ## 環境構築
 
 
