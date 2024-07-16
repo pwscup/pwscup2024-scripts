@@ -11,7 +11,13 @@ import numpy as np
 # pandasのデータフレームを入力することを想定
 def anonymize(df):
     anonymized_df = df.copy()
+    movie_column = [2,56,247,260,653,673,810,885,1009,1073,1097,1126,1525,1654,1702,1750,1881,1920,1967,2017,2021,2043,2086,2087,2093,2100,2105,2138,2143,2174,2193,2253,2399,2628,2797,2872,2968,3393,3438,3439,3440,3466,3479,3489,3877,3889]
+    # 数字を文字列に変換し、カンマで連結
+    movie_column = [str(num) for num in movie_column]
 
+    # 加工処理の適用
+    anonymized_df.drop('Name', axis=1, inplace=True)
+    anonymized_df = group_shuffle(anonymized_df, ["Gender","Age"], movie_column[1:3])
     anonymized_df = random_shuffle(anonymized_df)
 
     return anonymized_df
@@ -28,6 +34,21 @@ def random_shuffle(df):
         anonymized_df.loc[users[1], df.columns[col_ind]] = tmp
 
     return anonymized_df
+
+
+def group_shuffle(df, groups, targets):
+    # group列で指定した列の値が同じ行内で、targets列の値をシャッフルする
+    # Resulting DataFrame
+    result = df.copy()
+    
+    # Iterate over each group
+    for name, group_data in df.groupby(groups):
+        for target in targets:
+            # Shuffle the target column within the current group
+            shuffled_values = np.random.permutation(group_data[target].values)
+            result.loc[group_data.index, target] = shuffled_values
+    
+    return result
 
 
 # メインの実行部分
