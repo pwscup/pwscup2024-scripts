@@ -3,6 +3,8 @@ import os
 import sys
 from tqdm import tqdm
 
+valid_num_rows = 10000
+
 def check_csv_file(file1, file2):
     # CSVファイルの存在確認
     if not os.path.exists(file1):
@@ -27,9 +29,9 @@ def check_csv_file(file1, file2):
     total_checks = len(C.columns) + 2  # 行数・列数チェック + 列ごとのチェック
     progress_bar = tqdm(total=total_checks, desc="チェック進行中", ncols=100)
 
-    # 1. 行数と列数が同じであることを確認
-    if B.shape != C.shape:
-        errors.append("行数または列数が一致しません")
+    # 1. 行数が指定どおりであること
+    if C.shape[0] != valid_num_rows:
+        errors.append(f"行数が{valid_num_rows}ではありません")
         progress_bar.update(1)
         progress_bar.close()
         return False, errors

@@ -17,8 +17,11 @@ def anonymize(df):
     anonymized_df = df.copy()
 
     # 加工処理の適用
+    print("1. Name列の削除")
     anonymized_df.drop('Name', axis=1, inplace=True)
-    anonymized_df = group_shuffle(anonymized_df, ["Gender","Age"], movie_column[1:3])
+    print("2. Gender, Ageが一致しているユーザの中で、映画の評価をシャッフル")
+    anonymized_df = group_shuffle(anonymized_df, ["Gender","Age"], movie_column)
+    print("3. ランダムな列でシャッフル")
     anonymized_df = random_shuffle(anonymized_df)
 
     return anonymized_df
