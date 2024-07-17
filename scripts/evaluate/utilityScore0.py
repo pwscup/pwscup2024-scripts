@@ -3,6 +3,7 @@ import numpy as np
 import sys
 from sklearn.metrics import mean_absolute_error
 from tqdm import tqdm
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 def load_data(file1, file2):
     df1 = pd.read_csv(file1)
@@ -27,40 +28,49 @@ def numpy_crosstab(index, columns, unique_index, unique_columns):
             crosstab_result[row_idx, col_idx] += 1
     return crosstab_result
 
-def find_max_mae_and_columns(file1, file2):
+def process_column_pair(col_pair, df1, df2):
+    col1, col2 = col_pair
+    unique_index = np.union1d(df1[col1].unique(), df2[col1].unique())
+    unique_columns = np.union1d(df1[col2].unique(), df2[col2].unique())
+    ct1 = numpy_crosstab(df1[col1], df1[col2], unique_index, unique_columns)
+    ct2 = numpy_crosstab(df2[col1], df2[col2], unique_index, unique_columns)
+    mae = calculate_mae(ct1.flatten(), ct2.flatten())
+    return mae, col_pair
+
+def find_max_mae_and_columns(file1, file2, parallel=1):
     df1, df2 = load_data(file1, file2)
     columns = list(set(df1.columns) & set(df2.columns))  # 共通カラムのみ考慮
+    column_pairs = [(col1, col2) for col1 in columns for col2 in columns if col1 != col2]
     max_mae = -1
     max_mae_columns = None
-    
-    total_combinations = len(columns) * (len(columns) - 1)  # 自己ペアは除外
-    progress_bar = tqdm(total=total_combinations, desc="Processing")
 
-    for col1 in columns:
-        for col2 in columns:
-            if col1 != col2:
-                unique_index = np.union1d(df1[col1].unique(), df2[col1].unique())
-                unique_columns = np.union1d(df1[col2].unique(), df2[col2].unique())
-                ct1 = numpy_crosstab(df1[col1], df1[col2], unique_index, unique_columns)
-                ct2 = numpy_crosstab(df2[col1], df2[col2], unique_index, unique_columns)
-                mae = calculate_mae(ct1.flatten(), ct2.flatten())
-                progress_bar.update(1)  # プログレスバーを更新
-                if mae > max_mae:
-                    max_mae = mae
-                    max_mae_columns = (col1, col2)
+    with ProcessPoolExecutor(max_workers=parallel) as executor:
+        futures = {executor.submit(process_column_pair, pair, df1, df2): pair for pair in column_pairs}
+        progress_bar = tqdm(total=len(column_pairs), desc="Processing")
+        for future in as_completed(futures):
+            mae, col_pair = future.result()
+            progress_bar.update(1)
+            if mae > max_mae:
+                max_mae = mae
+                max_mae_columns = col_pair
+        progress_bar.close()
 
-    progress_bar.close()
     return max_mae, max_mae_columns
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python utilityScore0.py <filename1> <filename2>")
+    if len(sys.argv) < 3:
+        print("Usage: python utilityScore0.py <filename1> <filename2> [--parallel N]")
         sys.exit(1)
 
     file1 = sys.argv[1]
     file2 = sys.argv[2]
-    max_mae, max_mae_columns = find_max_mae_and_columns(file1, file2)
+    parallel = 1  # デフォルトはシングルスレッド
+    if len(sys.argv) == 5 and sys.argv[3] == '--parallel':
+        parallel = int(sys.argv[4])
+
+    max_mae, max_mae_columns = find_max_mae_and_columns(file1, file2, parallel)
     us = "{:.3f}".format((1-max_mae)*100)
     print(f"Max Mean Absolute Error: {max_mae}")
     print(f"Columns with max MAE: {max_mae_columns}")
     print(f"Utility Score: {us}")
+

@@ -1,14 +1,16 @@
-how_help() {
+show_help() {
   echo "使い方: bash $(basename $0) [オプション] <加工対象ファイルのフルパス(.csv)> <加工後ファイルの出力先フルパス(.csv)>"
   echo "引数が2つ必要です。"
   echo "  -h, --help         ヘルプを表示します。"
-  echo "  -a, --anon         加工のみ実行します。"
+  echo "  -a, --anonymize    加工のみ実行します。"
   echo "  -e, --evaluate     評価のみ実行します。"
   echo "  -c, --check        チェックのみ実行します。"
+  echo "  -p, --parallel N   N並列で実行します。"
 }
 
 # 引数の解析
 POSITIONAL_ARGS=()
+PARALLEL=1  # デフォルトはシングルスレッド
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -16,7 +18,7 @@ while [[ $# -gt 0 ]]; do
       show_help
       exit 0
       ;;
-    -a|--anon)
+    -a|--anonymize)
       ANON_ONLY=1
       shift # 引数を消費
       ;;
@@ -26,6 +28,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     -c|--check)
       CHECK_ONLY=1
+      shift # 引数を消費
+      ;;
+    -p|--parallel)
+      PARALLEL=$2
+      shift # 引数を消費
       shift # 引数を消費
       ;;
     -*|--*)
@@ -67,7 +74,7 @@ if [[ -z $ANON_ONLY && -z $EVALUATE_ONLY && -z $CHECK_ONLY ]]; then
   echo "チェックを開始します。"
   python3 $dir/scripts/operation/checkCi.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
   echo "評価を開始します。"
-  python3 $dir/scripts/evaluate/utilityScore0.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
+  python3 $dir/scripts/evaluate/utilityScore0.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH --parallel $PARALLEL
 else
   if [[ -n $ANON_ONLY ]]; then
     echo "加工を開始します。"
@@ -81,7 +88,7 @@ else
 
   if [[ -n $EVALUATE_ONLY ]]; then
     echo "評価を開始します。"
-    python3 $dir/scripts/evaluate/utilityScore0.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH
+    python3 $dir/scripts/evaluate/utilityScore0.py $INPUT_FILE_PATH $OUTPUT_FILE_PATH --parallel $PARALLEL
   fi
 
 fi
