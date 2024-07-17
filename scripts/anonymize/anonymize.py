@@ -6,14 +6,15 @@ import random
 import pandas as pd
 import numpy as np
 
+movie_column = [2,56,247,260,653,673,810,885,1009,1073,1097,1126,1525,1654,1702,1750,1881,1920,1967,2017,2021,2043,2086,2087,2093,2100,2105,2138,2143,2174,2193,2253,2399,2628,2797,2872,2968,3393,3438,3439,3440,3466,3479,3489,3877,3889]
+# 数字を文字列に変換し、カンマで連結
+movie_column = [str(num) for num in movie_column]
+
 # 匿名化処理を書いた関数
 # ここを変更すると匿名化の方法を変えられる
 # pandasのデータフレームを入力することを想定
 def anonymize(df):
     anonymized_df = df.copy()
-    movie_column = [2,56,247,260,653,673,810,885,1009,1073,1097,1126,1525,1654,1702,1750,1881,1920,1967,2017,2021,2043,2086,2087,2093,2100,2105,2138,2143,2174,2193,2253,2399,2628,2797,2872,2968,3393,3438,3439,3440,3466,3479,3489,3877,3889]
-    # 数字を文字列に変換し、カンマで連結
-    movie_column = [str(num) for num in movie_column]
 
     # 加工処理の適用
     anonymized_df.drop('Name', axis=1, inplace=True)
@@ -22,19 +23,17 @@ def anonymize(df):
 
     return anonymized_df
 
-def random_shuffle(df):
+def random_shuffle(df, rep=1000):
     # ランダムに選んだ列の中でセルの入れ替え　x 1000回
     anonymized_df = df.copy()
-    for _ in range(1000):
-        col_ind = random.randint(5, 50)
-        users = np.random.choice(np.arange(10000), 2, replace=False)
-        tmp = anonymized_df.loc[users[0], anonymized_df.columns[col_ind]]
-        anonymized_df.loc[users[0], anonymized_df.columns[col_ind]] = anonymized_df.loc[users[1],
-                                                                anonymized_df.columns[col_ind]]
-        anonymized_df.loc[users[1], df.columns[col_ind]] = tmp
+    for _ in range(rep):
+        col_name = random.choice(movie_column)
+        users = np.random.choice(np.arange(len(df)), 2, replace=False)
+        tmp = anonymized_df.loc[users[0], col_name]
+        anonymized_df.loc[users[0], col_name] = anonymized_df.loc[users[1], col_name]
+        anonymized_df.loc[users[1], col_name] = tmp
 
     return anonymized_df
-
 
 def group_shuffle(df, groups, targets):
     # group列で指定した列の値が同じ行内で、targets列の値をシャッフルする
@@ -73,9 +72,5 @@ if __name__ == "__main__":
     # 匿名化処理
     Ci = anonymize(Bi)
 
-    # 匿名化されたデータフレームの行数と列数を簡易チェック
-    # 行数と列数が間違っていた場合はここで強制終了
-    assert Ci.shape == (10000, 51), "invalid Ci"
-    
     # 結果の出力
     Ci.to_csv(output_file_path, index=False)
