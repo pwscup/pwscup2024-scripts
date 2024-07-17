@@ -55,14 +55,17 @@ pwscup2024-dev/
 
 処理を、一貫して実行します。
 
-使い方は、-hで表示されるヘルプをご参照ください
+使い方は、-hで表示されるヘルプをご参照ください。
+
+-aで匿名化のみ、-cでチェックのみ、-eで評価のみ、オプションなしだとすべてを順番に実行します。
+
 ```bash
 bash run.bash -h
 ```
 
 ### 加工の個別実行
 
-`anonymize.py` はデータを匿名化するためのスクリプトです。以下のコマンドで実行します：
+`scripts/anonymize/anonymize.py` はデータを匿名化するためのスクリプトです。以下のコマンドで実行します：
 
 ```bash
 python3 scripts/anonymize/anonymize.py <入力ファイルパス> <出力ファイルパス>
@@ -76,7 +79,7 @@ bash run.bash -a  <入力ファイルパス> <出力ファイルパス>
 
 ### 評価の個別実行
 
-`utilityScore0.py` はデータの有用性評価を行うスクリプトです(CodaBenchへの提出は別途必要です。ご注意ください)。以下のコマンドで実行します：
+`scripts/evaluate/utilityScore0.py` はデータの有用性評価を行うスクリプトです(CodaBenchへの提出は別途必要です。ご注意ください)。以下のコマンドで実行します：
 
 ```bash
 python3 scripts/evaluate/utilityScore0.py <入力ファイルパス> <出力ファイルパス>
@@ -90,7 +93,7 @@ bash run.bash -e  <入力ファイルパス> <出力ファイルパス>
 
 ### データチェックスクリプト
 
-`checkCi.py` 加工後データの値域が正しいことを確認するスクリプトです。以下のコマンドで実行します：
+`scripts/operation/checkCi.py` 加工後データの値域が正しいことを確認するスクリプトです。以下のコマンドで実行します：
 
 ```bash
 python3 scripts/operation/checkCi.py <入力ファイルパス> <出力ファイルパス>
@@ -129,7 +132,7 @@ uv create venv
 
 ```bash
 source .venv/bin/activate
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 これで環境構築は完了です。
