@@ -1,4 +1,4 @@
-how_help() {
+show_help() {
   echo "使い方: bash $(basename $0) [オプション] <加工対象ファイルのフルパス(.csv)> <加工後ファイルの出力先フルパス(.csv)>"
   echo "引数が2つ必要です。"
   echo "  -h, --help         ヘルプを表示します。"
