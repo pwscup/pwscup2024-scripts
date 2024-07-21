@@ -18,14 +18,18 @@ def find_max_mae_and_columns(file1, file2, parallel=1):
     # 除外するカラム名のペアを定義
     excluded_columns = {'Name', 'Gender', 'Age', 'Occupation', 'ZIP-code'}
 
-    # カラム名のペアを生成し、除外するペアをフィルタリング
-    column_pairs = [
-        [col1, col2] for col1 in columns for col2 in columns
-        if col1 != col2 and not (col1 in excluded_columns and col2 in excluded_columns)
-    ]
+     # カラム名のペアを生成し、除外するペアをフィルタリング
+    column_pairs = set()
+    for col1 in columns:
+        for col2 in columns:
+            if col1 != col2 and not (col1 in excluded_columns and col2 in excluded_columns):
+                pair = tuple(sorted((col1, col2)))
+                column_pairs.add(pair)
 
     err_dic = {}
-    for column_pair in column_pairs:
+    for pair in column_pairs:
+      c1,c2 = pair
+      column_pair = [c1, c2]
       freq1 = df1.value_counts(column_pair)
       freq2 = df2.value_counts(column_pair)
       err_dic[",".join(column_pair)] = (freq1 - freq2).abs().mean()
