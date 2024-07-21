@@ -10,52 +10,29 @@ def load_data(file1, file2):
     df2 = pd.read_csv(file2)
     return df1, df2
 
-def calculate_mae(bincount1, bincount2):
-    # MAEを計算
-    mae = mean_absolute_error(bincount1, bincount2)
-    # MAEを0から1の範囲に正規化
-    normalized_mae = mae / (np.max(bincount1) - np.min(bincount1))
-    return normalized_mae
-
-def numpy_crosstab(index, columns, unique_index, unique_columns):
-    index_map = {value: idx for idx, value in enumerate(unique_index)}
-    columns_map = {value: idx for idx, value in enumerate(unique_columns)}
-    crosstab_result = np.zeros((len(unique_index), len(unique_columns)), dtype=int)
-    for idx, col in zip(index, columns):
-        row_idx = index_map.get(idx, -1)
-        col_idx = columns_map.get(col, -1)
-        if row_idx != -1 and col_idx != -1:
-            crosstab_result[row_idx, col_idx] += 1
-    return crosstab_result
-
-def process_column_pair(col_pair, df1, df2):
-    col1, col2 = col_pair
-    unique_index = np.union1d(df1[col1].unique(), df2[col1].unique())
-    unique_columns = np.union1d(df1[col2].unique(), df2[col2].unique())
-    ct1 = numpy_crosstab(df1[col1], df1[col2], unique_index, unique_columns)
-    ct2 = numpy_crosstab(df2[col1], df2[col2], unique_index, unique_columns)
-    mae = calculate_mae(ct1.flatten(), ct2.flatten())
-    return mae, col_pair
 
 def find_max_mae_and_columns(file1, file2, parallel=1):
     df1, df2 = load_data(file1, file2)
     columns = list(set(df1.columns) & set(df2.columns))  # 共通カラムのみ考慮
-    column_pairs = [(col1, col2) for col1 in columns for col2 in columns if col1 != col2]
-    max_mae = -1
-    max_mae_columns = None
 
-    with ProcessPoolExecutor(max_workers=parallel) as executor:
-        futures = {executor.submit(process_column_pair, pair, df1, df2): pair for pair in column_pairs}
-        progress_bar = tqdm(total=len(column_pairs), desc="Processing")
-        for future in as_completed(futures):
-            mae, col_pair = future.result()
-            progress_bar.update(1)
-            if mae > max_mae:
-                max_mae = mae
-                max_mae_columns = col_pair
-        progress_bar.close()
+    # 除外するカラム名のペアを定義
+    excluded_columns = {'Name', 'Gender', 'Age', 'Occupation', 'ZIP-code'}
 
-    return max_mae, max_mae_columns
+    # カラム名のペアを生成し、除外するペアをフィルタリング
+    column_pairs = [
+        [col1, col2] for col1 in columns for col2 in columns
+        if col1 != col2 and not (col1 in excluded_columns and col2 in excluded_columns)
+    ]
+
+    err_dic = {}
+    for column_pair in column_pairs:
+      freq1 = df1.value_counts(column_pair)
+      freq2 = df2.value_counts(column_pair)
+      err_dic[",".join(column_pair)] = (freq1 - freq2).abs().mean()
+      ## 何かで規格化する必要がある
+
+    return max(err_dic.items(), key=lambda x: x[1])
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
@@ -68,7 +45,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 5 and sys.argv[3] == '--parallel':
         parallel = int(sys.argv[4])
 
-    max_mae, max_mae_columns = find_max_mae_and_columns(file1, file2, parallel)
+    max_mae_columns, max_mae = find_max_mae_and_columns(file1, file2, parallel)
     us = "{:.3f}".format((1-max_mae)*100)
     print(f"Max Mean Absolute Error: {max_mae}")
     print(f"Columns with max MAE: {max_mae_columns}")
