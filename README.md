@@ -124,7 +124,7 @@ pip install uv
 次に、uvを使用してPythonの仮想環境を作成します。ここでは、仮想環境の名前を`venv`としています。
 
 ```bash
-uv create venv
+uv venv
 ```
 
 ### 3. uvでpip installする（requirements.txtを参照して）
