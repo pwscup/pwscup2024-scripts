@@ -32,10 +32,14 @@ def find_max_mae_and_columns(file1, file2, parallel=1):
       column_pair = [c1, c2]
       freq1 = df1.value_counts(column_pair)
       freq2 = df2.value_counts(column_pair)
-      err_dic[",".join(column_pair)] = (freq1 - freq2).abs().mean() / (freq1.max() - freq1.min())
-      ## 何かで規格化する必要がある
+      err_dic[",".join(column_pair)] = (freq1 - freq2).abs().mean()
 
-    return max(err_dic.items(), key=lambda x: x[1])
+    # MAEの規格化
+    max_mae_columns, max_mae = max(err_dic.items(), key=lambda x: x[1])
+    normalize = 20000 # ルール資料通り
+    max_mae = max_mae / normalize
+
+    return max_mae_columns, max_mae
 
 
 if __name__ == "__main__":
@@ -51,7 +55,8 @@ if __name__ == "__main__":
 
     max_mae_columns, max_mae = find_max_mae_and_columns(file1, file2, parallel)
     us = "{:.3f}".format((1-max_mae)*100)
-    print(f"Max Mean Absolute Error: {max_mae}")
+    max_mae_value = "{:.5f}".format(max_mae)
+    print(f"Max Mean Absolute Error: {max_mae_value}")
     print(f"Columns with max MAE: {max_mae_columns}")
     print(f"Utility Score: {us}")
 
