@@ -1,7 +1,17 @@
-import pandas as pd
-import numpy as np
+"""
+
+攻撃プログラムのサンプルです。サンプル匿名性の評価にも使っています。
+ID32を攻撃したい際は、B32a.csv, B32b.csv, C32_0.csv ~ C32_9.csvが配置されているフォルダで実行してください。
+
+"""
+
 import sys
 import os
+import argparse
+
+import pandas as pd
+import numpy as np
+
 
 def hamming_distance(s1, s2):
     return sum(el1 != el2 for el1, el2 in zip(s1, s2))
@@ -41,12 +51,12 @@ def main(a_prefix, b_prefix, c_prefix):
         ['260', '1073', '1097', '2100', '2105', '2174', '2193', '2628', '2797', '2968']
     ]
 
-    final_columns = ['Gender', 'Age', 'Occupation', 'ZIP-code', '2', '56', '247', '260', '653', '673', '810', '885', 
+    final_columns = ['Gender', 'Age', 'Occupation', 'ZIP-code', '2', '56', '247', '260', '653', '673', '810', '885',
                      '1009', '1073', '1097', '1126', '1525', '1654', '1702', '1750', '1881', '1920', '1967', '2017',
                      '2021', '2043', '2086', '2087', '2093', '2100', '2105', '2138', '2143', '2174', '2193', '2253',
                      '2399', '2628', '2797', '2872', '2968', '3393', '3438', '3439', '3440', '3466', '3479', '3489',
                      '3877', '3889']
-    
+
     # T を作成
     T_parts = []
     column_names = []
@@ -55,11 +65,11 @@ def main(a_prefix, b_prefix, c_prefix):
         if not os.path.exists(c_file):
             print(f'{c_file} does not exist')
             sys.exit(1)
-        
+
         df = read_columns(c_file, cols)
         T_parts.append(df)
         column_names.extend(cols)
-    
+
     T = pd.concat(T_parts, axis=1)
 
     # Tの列を指定された順に並べ替え
@@ -67,23 +77,23 @@ def main(a_prefix, b_prefix, c_prefix):
 
     # Tをcsvファイルとして出力
 #    T.to_csv('output_T.csv', index=False)
-    
+
     # a.csv の各行を連結
     a_combined = a.apply(lambda row: ''.join(row.astype(str)), axis=1).values
 
     # 最小のハミング距離を持つ a.csv の行番号を格納するリスト
     min_indices = []
     filled_values = []
-    
+
     # b.csv の各行について、最小のハミング距離を持つ a.csv の行番号を計算
     for b_index, b_row in b.iterrows():
         min_distance = float('inf')
         min_index = -1
         b_str = ''.join(b_row.astype(str))
-        
+
         for a_index, a_str in enumerate(a_combined):
             combined_str = a_str + b_str
-            
+
             i=0
             for t_row in T.itertuples(index=False, name=None):
                 t_str = ''.join(map(str, t_row))
@@ -112,12 +122,17 @@ def main(a_prefix, b_prefix, c_prefix):
     output_df.to_csv('E.csv', index=False, header=None)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python script.py <a_file> <b_file> <c_prefix>")
-        sys.exit(1)
+    # コマンドライン引数を読みこむ
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('Ba_prefix', help='e.g., B32a')
+    parser.add_argument('Bb_prefix', help='e.g., B32b')
+    parser.add_argument('C_prefix', help='e.g., C32')
+    # 引数を増やしたい時は
+    # parser.add_argument('arg3')
+    args = parser.parse_args()
 
-    a_prefix = sys.argv[1]
-    b_prefix = sys.argv[2]
-    c_prefix = sys.argv[3]
+    a_prefix = args.Ba_prefix
+    b_prefix = args.Bb_prefix
+    c_prefix = args.C_prefix
 
     main(a_prefix, b_prefix, c_prefix)
