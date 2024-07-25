@@ -1,13 +1,22 @@
+"""
+
+配布データから攻撃用データを作るプログラムです。
+例えば、B32と入力するとB32.csvからB32s.csv, B32a.csv, B32b.csv, B32x.csvを書き出します。
+
+"""
+
 import sys
 import csv
 import random
+import argparse
+
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python script.py BXX")
-        return
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('org_csv_prefix', help='配布データのprefix(e.g., B32)')
+    args = parser.parse_args()
 
-    inname = sys.argv[1]
+    inname = args.org_csv_prefix
     infile = inname + '.csv'
 
     # Read the input CSV file
@@ -41,7 +50,7 @@ def main():
     # Write BXXb.csv with random order and modified random column
     with open(inname + 'b.csv', 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
-        
+
         # Randomize rows excluding the header
         randomized_rows = second_part[1:]
         shuffle_indices = list(range(50))
@@ -54,7 +63,7 @@ def main():
             random_col_index = random.randint(0, len(row) - 1)
             original_values.append(row[random_col_index])
             row[random_col_index] = '*'
-        
+
         # Write header and modified rows to BXXb.csv
         writer.writerow(header[5:])
         writer.writerows([randomized_rows[idx] for idx in shuffle_indices])
@@ -64,7 +73,7 @@ def main():
         writer = csv.writer(f)
         for i in range(50):
             writer.writerow([shuffle_indices[i], original_values[i]])
-        
+
         # Write the pairs indicating the swapping of rows and original values
 #        for i, row in enumerate(randomized_rows, start=1):
 #            original_index = selected_rows.index(second_part[i][5:]) + 1  # Get the original index in BXXs.csv (+1 for 1-based index)
