@@ -1,9 +1,19 @@
+"""
+
+匿名化データ(e.g., C32_3.csv)の分割後配布データ(e.g., B32_3.csv)に対する有用性だけを評価したい場合に使うプログラムです。
+有用性スコアを評価したい場合はutilityScore.pyを使ってください。
+
+"""
+
+import sys
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import argparse
+
 import pandas as pd
 import numpy as np
-import sys
 from sklearn.metrics import mean_absolute_error
 from tqdm import tqdm
-from concurrent.futures import ProcessPoolExecutor, as_completed
+
 
 def load_data(file1, file2):
     df1 = pd.read_csv(file1)
@@ -43,15 +53,15 @@ def find_max_mae_and_columns(file1, file2, parallel=1):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: python utilityScore0.py <filename1> <filename2> [--parallel N]")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('org_csv', help='分割後の配布データ(e.g., B32_3.csv)')
+    parser.add_argument('ano_csv', help='匿名化データ(e.g., C32_3.csv)')
+    parser.add_argument('--parallel', default=1, help='並列処理スレッド数')
+    args = parser.parse_args()
 
-    file1 = sys.argv[1]
-    file2 = sys.argv[2]
-    parallel = 1  # デフォルトはシングルスレッド
-    if len(sys.argv) == 5 and sys.argv[3] == '--parallel':
-        parallel = int(sys.argv[4])
+    file1 = args.org_csv
+    file2 = args.ano_csv
+    parallel = args.parallel
 
     max_mae_columns, max_mae = find_max_mae_and_columns(file1, file2, parallel)
     us = "{:.3f}".format((1-max_mae)*100)
@@ -59,4 +69,3 @@ if __name__ == "__main__":
     print(f"Max Mean Absolute Error: {max_mae_value}")
     print(f"Columns with max MAE: {max_mae_columns}")
     print(f"Utility Score: {us}")
-
