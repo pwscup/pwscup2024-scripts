@@ -14,7 +14,12 @@ import argparse
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('org_csv_prefix', help='配布データのprefix(e.g., B32)')
+    parser.add_argument('--seed', type=int, help='乱数シードを整数で指定してください')
+
     args = parser.parse_args()
+
+    if args.seed is not None:
+        random.seed(args.seed)
 
     inname = args.org_csv_prefix
     infile = inname + '.csv'
