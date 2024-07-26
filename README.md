@@ -24,13 +24,13 @@
 ```
 pwscup2024-dev/
 ├── README.md　：本ファイル
-├── run.bash　：加工・評価の一括実行用スクリプト
+├── run.bash　：(加工フェーズ) 加工・評価の一括実行用スクリプト
 ├── data/　　　：データ置き場
 │   ├── raw/
 │   │   └── A.csv
-│   ├── output/　：加工後ファイル置き場
-│   │   └── C.csv
-│   └── sample/　：加工前ファイル置き場
+│   ├── output/　：加工後ファイル(C)置き場
+│   │   └── sampleC.csv
+│   └── sample/　：加工前ファイル(B)置き場
 │       └── sampleBi.csv
 ├── scripts/　　　：スクリプト置き場
 │   ├── anonymize/：加工スクリプト
@@ -38,8 +38,11 @@ pwscup2024-dev/
 │   ├── evaluate/：評価スクリプト
 │   │   └── utilityScore0.py
 │   └── operation/：その他
-│   │   ├── checkCi.py
-│       └── checkhashvalue.py
+│   │   ├── checkhashvalue.py：(加工フェーズ) 配布データのintegrityを確認する際に利用する
+│   │   ├── checkCi.py：(加工フェーズ) Bから作成した匿名化データCの形式が正しいことをチェックする際に利用する
+│   │   ├── maketest.py：(攻撃フェーズ) 配布データから攻撃用データを作成する際に利用する
+│   │   ├── answercheck.py：(攻撃フェーズ) 正解と攻撃結果を比較して、攻撃得点を計算する際に利用する
+│       └── split.py：(運営用) 運営が、Bi.csvから10パターンのサブセットデータを作成する際に利用する
 └── .gitignore
 ```
 
