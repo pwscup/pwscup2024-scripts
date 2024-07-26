@@ -2,7 +2,8 @@
 
 配布データを10個に分割するプログラムです。
 参加者には分割済みのデータも配布しているので、基本的に使用する必要はありません。
-
+python3 ./scripts/operation/split.py ./data/sample/B32 などと実行すると、
+./data/sampleに、B32_[0-9].csvの10ファイルが作成されます
 """
 
 import sys
