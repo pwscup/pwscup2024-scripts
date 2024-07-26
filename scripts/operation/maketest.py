@@ -8,8 +8,8 @@
 import sys
 import csv
 import random
+import warnings
 import argparse
-
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -27,6 +27,22 @@ def main():
     # Separate header and data rows
     header = data[0]
     rows = data[1:]
+
+    # check the columns
+    expected_columns = ['Name', 'Gender', 'Age', 'Occupation', 'ZIP-code', '2', '56', '247', '260', '653', '673', '810', '885',
+                     '1009', '1073', '1097', '1126', '1525', '1654', '1702', '1750', '1881', '1920', '1967', '2017',
+                     '2021', '2043', '2086', '2087', '2093', '2100', '2105', '2138', '2143', '2174', '2193', '2253',
+                     '2399', '2628', '2797', '2872', '2968', '3393', '3438', '3439', '3440', '3466', '3479', '3489',
+                     '3877', '3889']
+
+    if len(header) == len(expected_columns):
+        for i in range(len(expected_columns)):
+            if header[i] != expected_columns[i]:
+                warnings.warn("想定していないCSVが入力されています")
+                break
+
+    else:
+        warnings.warn("想定していないCSVが入力されています")
 
     # Randomly select 50 rows
     selected_rows = random.sample(rows, 50)
