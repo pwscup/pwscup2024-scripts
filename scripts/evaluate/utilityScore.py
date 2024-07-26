@@ -43,10 +43,10 @@ def us(id, input_path, output_path, parallel):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--id', type=validate_id, help='Specify the ID directly.')
-    parser.add_argument('--input', default=".", help='Specify the path for input files.')
-    parser.add_argument('--output', default=".", help='Specify the path for output files.')
-    parser.add_argument('--parallel', type=int, default=1, help='Number of parallel processing threads.')
+    parser.add_argument('--id', type=validate_id, help='2桁の数字でIDを指定してください')
+    parser.add_argument('--input', default=".", help='配布データ(例：B00_0.csv)が配置されているフォルダのパスを指定して下さい')
+    parser.add_argument('--output', default=".", help='匿名化データ(例：C00_0.csv)が配置されているフォルダのパスを指定して下さい')
+    parser.add_argument('--parallel', type=int, default=1, help='並列実行のパラメータを指定してください')
     args = parser.parse_args()
 
     if args.id:
