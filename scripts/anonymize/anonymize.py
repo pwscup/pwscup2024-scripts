@@ -1,7 +1,14 @@
+"""
+
+匿名化プログラムのサンプルです。
+
+"""
+
 import sys
 import csv
 import os
 import random
+import argparse
 
 import pandas as pd
 import numpy as np
@@ -56,14 +63,17 @@ def group_shuffle(df, groups, targets):
 
 # メインの実行部分
 if __name__ == "__main__":
-    # 引数の数が間違っていたら強制終了
-    if len(sys.argv) != 3:
-            print(f"Usage: python {os.path.basename(__file__)} <filename>")
-            sys.exit(1)
+    # コマンドライン引数を読みこむ
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('org_csv', help='匿名化したいcsvファイル(e.g., B32_3.csv)')
+    parser.add_argument('ano_csv', help='匿名化ファイルにつけたい名前(e.g., C32_3.csv)')
+    # 引数を増やしたい時は
+    # parser.add_argument('arg3')
+    args = parser.parse_args()
 
     # CSVファイルパスの読み込み
-    input_file_path = sys.argv[1]
-    output_file_path = sys.argv[2]
+    input_file_path = args.org_csv
+    output_file_path = args.ano_csv
 
     # CSVファイルをpandasのデータフレームとして読み込む
     # 不正なファイルパスを指定するとここで強制終了

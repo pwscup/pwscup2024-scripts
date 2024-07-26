@@ -1,5 +1,15 @@
-import pandas as pd
+"""
+
+配布データを10個に分割するプログラムです。
+参加者には分割済みのデータも配布しているので、基本的に使用する必要はありません。
+
+"""
+
 import sys
+import argparse
+
+import pandas as pd
+
 
 def create_output_files(inname):
     # Bi.csvファイルを読み込む
@@ -70,8 +80,9 @@ def create_output_files(inname):
     df_Bi_9.to_csv(out9, index=False)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python3 split.py Bi00")
-    else:
-        inname = sys.argv[1]
-        create_output_files(inname)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('org_csv_prefix', help='配布データのprefix(e.g., B32)')
+    args = parser.parse_args()
+
+    inname = args.org_csv_prefix
+    create_output_files(inname)

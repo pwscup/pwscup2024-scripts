@@ -1,6 +1,17 @@
-import pandas as pd
+"""
+
+このプログラムは入力されたCSVファイルが有用性評価プログラムに適した形式であるかを検証します。
+「すべてのチェックをクリアしました」
+と表示されれば、有用性評価ブログラムが適切に採点できる形式になっています。
+強制終了した場合はエラーメッセージを参考にCSVファイルを再検討してください。
+
+"""
+
+import argparse
 import os
 import sys
+
+import pandas as pd
 from tqdm import tqdm
 
 valid_num_rows = 10000
@@ -13,18 +24,18 @@ def check_csv_file(file1, file2):
     if not os.path.exists(file2):
         print(f"エラー: ファイル '{file2}' が存在しません")
         return False, [f"ファイル '{file2}' が存在しません"]
-    
+
     # CSVファイルを読み込む
     df1 = pd.read_csv(file1)
     df2 = pd.read_csv(file2)
-    
+
     # "Name"列を削除して比較用のデータを作成
     B = df1.drop(columns=["Name"], errors='ignore')
     C = df2.drop(columns=["Name"], errors='ignore')
-    
+
     # チェックNGの箇所を記録するリスト
     errors = []
-    
+
     # 進捗表示用のtqdmの設定
     total_checks = len(C.columns) + 2  # 行数・列数チェック + 列ごとのチェック
     progress_bar = tqdm(total=total_checks, desc="チェック進行中", ncols=100)
@@ -36,7 +47,7 @@ def check_csv_file(file1, file2):
         progress_bar.close()
         return False, errors
     progress_bar.update(1)
-    
+
     # 2. 列名が一致していることを確認
     if not all(B.columns == C.columns):
         errors.append("列名が一致しません")
@@ -44,7 +55,7 @@ def check_csv_file(file1, file2):
         progress_bar.close()
         return False, errors
     progress_bar.update(1)
-    
+
     # 3. 列ごとのチェック
     for col in C.columns:
         if col.isdigit():
@@ -58,7 +69,7 @@ def check_csv_file(file1, file2):
                 if len(errors) >= 20:
                     break
         progress_bar.update(1)
-    
+
     progress_bar.close()
 
     if errors:
@@ -67,15 +78,23 @@ def check_csv_file(file1, file2):
     return True, []
 
 def main():
-    if len(sys.argv) != 3:
-        print("使い方: python3 checkCi.py input_file1.csv input_file2.csv")
-        sys.exit(1)
-    
-    file1 = sys.argv[1]
-    file2 = sys.argv[2]
-    
+    # コマンドライン引数のパーサーを定義
+    parser = argparse.ArgumentParser(description=__doc__)
+
+    # コマンドライン引数を定義
+    parser.add_argument('org_csv',
+         help='分割された配布ファイル名(e.g., B32_9.csv)')
+    parser.add_argument('ano_csv',
+        help='検証したい匿名化ファイル名(e.g., C32_9.csv)')
+
+    # 引数を解析
+    args = parser.parse_args()
+
+    file1 = args.org_csv
+    file2 = args.ano_csv
+
     result, error_list = check_csv_file(file1, file2)
-    
+
     if not result:
         print("チェックがNGの箇所(20箇所まで表示します)：")
         for error in error_list:
@@ -85,4 +104,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

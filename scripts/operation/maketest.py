@@ -1,14 +1,22 @@
+"""
+
+配布データから攻撃用データを作るプログラムです。
+例えば、B32と入力するとB32.csvからB32s.csv, B32a.csv, B32b.csv, B32x.csvを書き出します。
+
+"""
+
 import sys
 import csv
 import random
 import warnings
+import argparse
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python script.py BXX")
-        return
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('org_csv_prefix', help='配布データのprefix(e.g., B32)')
+    args = parser.parse_args()
 
-    inname = sys.argv[1]
+    inname = args.org_csv_prefix
     infile = inname + '.csv'
 
     # Read the input CSV file
