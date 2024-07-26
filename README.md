@@ -24,7 +24,7 @@
 ```
 pwscup2024-dev/
 ├── README.md　：本ファイル
-├── run.bash　：(加工フェーズ) 加工・評価の一括実行用スクリプト
+├── sample_anonymize.bash　：(匿名化フェーズ) 加工・評価のサンプル実行用スクリプト
 ├── data/　　　：データ置き場
 │   ├── raw/
 │   │   └── A.csv
@@ -34,9 +34,12 @@ pwscup2024-dev/
 │       └── sampleBi.csv
 ├── scripts/　　　：スクリプト置き場
 │   ├── anonymize/：加工スクリプト
-│   │   └── anonymize.py
+│   │   └── anonymize.py            ：(匿名化フェーズ) 匿名化スクリプト
 │   ├── evaluate/：評価スクリプト
-│   │   └── utilityScore0.py
+│   │   ├── utilityScore.py         ：(匿名化フェーズ) 有用性評価スクリプト 0-9まで全てを一括で評価する
+│   │   └── utilityScoreSingle.py   ：(匿名化フェーズ) 有用性評価スクリプト 単体の評価
+│   ├── attack/　：攻撃スクリプト
+│   │   └── sampleAttack.py   ：(匿名化フェーズ/攻撃フェーズ) サンプル匿名性評価とサンプル攻撃用スクリプト
 │   └── operation/：その他
 │   │   ├── checkhashvalue.py ：(匿名化フェーズ) 配布データのintegrityを確認する際に利用する
 │   │   ├── checkCi.py        ：(匿名化フェーズ) Bから作成した匿名化データCの形式が正しいことをチェックする際に利用する
@@ -50,21 +53,10 @@ pwscup2024-dev/
 
 ### 匿名化と評価の一括実行
 
-`/run.bash` は、
-
-- /scripts/anonymize/anomymize.py の内容で加工して、
-- /scripts/operation/checkCi.py の内容でデータ品質をチェックして、
-- /scripts/evaluate/utilityScore0_progressbar.py 等の内容で評価する
-
-処理を、一貫して実行します。
-
-使い方は、-hで表示されるヘルプをご参照ください。
-
--aで匿名化のみ、-cでチェックのみ、-eで評価のみ、オプションなしだとすべてを順番に実行します。
-
 ```bash
-bash run.bash -h
+bash sample_anonymize.bash --id 00
 ```
+などとして、idを指定すると、サンプル加工スクリプトによる加工と評価が実行されます。
 
 ### 匿名化の個別実行
 
@@ -73,42 +65,27 @@ bash run.bash -h
 ```bash
 python3 scripts/anonymize/anonymize.py <入力ファイルパス> <出力ファイルパス>
 ```
-または、
-
-```bash
-bash run.bash -a  <入力ファイルパス> <出力ファイルパス>
-```
 
 
 ### 評価の個別実行
 
-`scripts/evaluate/utilityScoreSingle.py` は、./data/sample/B00_1.csvと./data/output/C00_1.csvのような匿名化前後データのパスを引数として渡して、データの有用性評価を行うスクリプトです。
+`./scripts/evaluate/utilityScoreSingle.py` は、./data/sample/B00_1.csvと./data/output/C00_1.csvのような匿名化前後データのパスを引数として渡して、データの有用性評価を行うスクリプトです。
 - 提出は行われません。CodaBenchへの提出は別途必要です。ご注意ください
 - チームの有用性評価値は、```_0```から```_9```までの10ファイルの評価値から定めます（[ルール資料](https://www.iwsec.org/pws/2024/cup24.html#%E5%8F%82%E5%8A%A0%E8%80%85%E5%90%91%E3%81%91%E8%B3%87%E6%96%99:~:text=%E6%B1%BA%E5%AE%9A%E3%81%97%E3%81%BE%E3%81%99%E3%80%82-,%E5%8F%82%E5%8A%A0%E8%80%85%E5%90%91%E3%81%91%E8%B3%87%E6%96%99,-PWSCup2024%EF%BC%86iPWSCup2024%20%E3%83%AB%E3%83%BC%E3%83%AB)【匿名化フェーズ】 有用性とサンプル匿名性を参照）
 
 以下のコマンドで実行します：
 
 ```bash
-python3 scripts/evaluate/utilityScoreSingle.py <入力ファイルパス> <出力ファイルパス>
-```
-または、
-
-```bash
-bash run.bash -e  <入力ファイルパス> <出力ファイルパス>
+python3 ./scripts/evaluate/utilityScoreSingle.py <入力ファイルパス> <出力ファイルパス>
 ```
 
 
 ### データチェックスクリプト
 
-`scripts/operation/checkCi.py` 匿名化後データの値域が正しいことを確認するスクリプトです。以下のコマンドで実行します：
+`./scripts/operation/checkCi.py` 匿名化後データの値域が正しいことを確認するスクリプトです。以下のコマンドで実行します：
 
 ```bash
-python3 scripts/operation/checkCi.py <入力ファイルパス> <出力ファイルパス>
-```
-または、
-
-```bash
-bash run.bash -c  <入力ファイルパス> <出力ファイルパス>
+python3 ./scripts/operation/checkCi.py <入力ファイルパス> <出力ファイルパス>
 ```
 
 ## 環境構築
