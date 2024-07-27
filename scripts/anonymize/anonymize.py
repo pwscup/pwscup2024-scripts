@@ -62,36 +62,44 @@ def group_shuffle(df, groups, targets):
 
     return anonymized_df
 
+def generate_output_filename(input_file_path, output_dir=None):
+    # 正規表現パターン：Bから始まり、2桁の数字が続き、_と1桁の数字、またはBから始まり2桁の数字が続く
+    pattern1 = re.compile(r'B(\d{2}_\d)\.csv$')
+    pattern2 = re.compile(r'B(\d{2})\.csv$')
+    
+    match1 = pattern1.search(input_file_path)
+    match2 = pattern2.search(input_file_path)
+    
+    if match1:
+        output_filename = re.sub(r'^B', 'C', match1.group(0))
+    elif match2:
+        output_filename = re.sub(r'^B', 'C', match2.group(0))
+    else:
+        warnings.warn("想定していないファイル名です")
+        output_filename = "C.csv"
+    
+    if output_dir:
+        return os.path.join(output_dir, output_filename)
+    else:
+        input_dir = os.path.dirname(input_file_path)
+        return os.path.join(input_dir, output_filename)
 
 # メインの実行部分
 if __name__ == "__main__":
     # コマンドライン引数を読みこむ
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('org_csv', help='匿名化したいcsvファイル(e.g., B32_3.csv)')
-    # コマンドライン引数を増やしたい時は次の行を追加する。ただし、arg2は好きな変数名に置き換える。
-    # parser.add_argument('arg2')
+    parser.add_argument('--output', '-o', help='出力ディレクトリ（指定しない場合は入力ファイルと同じディレクトリ）')
     args = parser.parse_args()
 
     # CSVファイルパスの読み込み
     input_file_path = args.org_csv
-    # 2つ目のコマンドライン引数を読み込む場合は次の行を追加
-    # var2 = args.arg2
+
+    # 出力ディレクトリの取得
+    output_dir = args.output
 
     # 匿名化ファイル名の決定
-    regex1 = re.compile('B\d{2}_\d\.csv$')
-    regex2 = re.compile('B\d{2}\.csv$')
-    if regex1.match(input_file_path) is not None:
-        output_file_path = list(input_file_path)
-        output_file_path[-9] = 'C'
-        output_file_path = ''.join(output_file_path)
-    elif regex2.match(input_file_path) is not None:
-        output_file_path = list(input_file_path)
-        output_file_path[-7] = 'C'
-        output_file_path = ''.join(output_file_path)
-    else:
-        # 入力されたcsv名が想定したフォーマットでなければ、C.csvにする
-        warnings.warn("想定していないファイル名です")
-        output_file_path = "C.csv"
+    output_file_path = generate_output_filename(input_file_path, output_dir)
 
     # CSVファイルをpandasのデータフレームとして読み込む
     # 不正なファイルパスを指定するとここで強制終了
@@ -103,3 +111,4 @@ if __name__ == "__main__":
     # 結果の出力
     Ci.to_csv(output_file_path, index=False)
     print(f"匿名化ファイルを{output_file_path}に保存しました")
+
