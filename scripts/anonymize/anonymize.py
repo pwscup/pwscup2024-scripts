@@ -1,6 +1,6 @@
 """
 
-匿名化プログラムのサンプルです。
+匿名化プログラムのサンプルです。配布データ(e.g., B32.csv and B32_3.csv)を匿名化します。
 
 """
 
@@ -9,6 +9,8 @@ import csv
 import os
 import random
 import argparse
+import warnings
+import re
 
 import pandas as pd
 import numpy as np
@@ -66,14 +68,30 @@ if __name__ == "__main__":
     # コマンドライン引数を読みこむ
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('org_csv', help='匿名化したいcsvファイル(e.g., B32_3.csv)')
-    parser.add_argument('ano_csv', help='匿名化ファイルにつけたい名前(e.g., C32_3.csv)')
-    # 引数を増やしたい時は
-    # parser.add_argument('arg3')
+    # コマンドライン引数を増やしたい時は次の行を追加する。ただし、arg2は好きな変数名に置き換える。
+    # parser.add_argument('arg2')
     args = parser.parse_args()
 
     # CSVファイルパスの読み込み
     input_file_path = args.org_csv
-    output_file_path = args.ano_csv
+    # 2つ目のコマンドライン引数を読み込む場合は次の行を追加
+    # var2 = args.arg2
+
+    # 匿名化ファイル名の決定
+    regex1 = re.compile('B\d{2}_\d\.csv$')
+    regex2 = re.compile('B\d{2}\.csv$')
+    if regex1.match(input_file_path) is not None:
+        output_file_path = list(input_file_path)
+        output_file_path[-9] = 'C'
+        output_file_path = ''.join(output_file_path)
+    elif regex2.match(input_file_path) is not None:
+        output_file_path = list(input_file_path)
+        output_file_path[-7] = 'C'
+        output_file_path = ''.join(output_file_path)
+    else:
+        # 入力されたcsv名が想定したフォーマットでなければ、C.csvにする
+        warnings.warn("想定していないファイル名です")
+        output_file_path = "C.csv"
 
     # CSVファイルをpandasのデータフレームとして読み込む
     # 不正なファイルパスを指定するとここで強制終了
@@ -84,3 +102,4 @@ if __name__ == "__main__":
 
     # 結果の出力
     Ci.to_csv(output_file_path, index=False)
+    print(f"匿名化ファイルを{output_file_path}に保存しました")
