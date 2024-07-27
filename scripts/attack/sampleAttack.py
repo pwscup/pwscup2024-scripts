@@ -8,6 +8,7 @@ ID32を攻撃したい際は、B32a.csv, B32b.csv, C32_0.csv ~ C32_9.csvが配�
 import sys
 import os
 import argparse
+from contextlib import redirect_stdout
 
 import pandas as pd
 import numpy as np
@@ -127,6 +128,7 @@ if __name__ == "__main__":
     parser.add_argument('Ba_prefix', help='e.g., B32a')
     parser.add_argument('Bb_prefix', help='e.g., B32b')
     parser.add_argument('C_prefix', help='e.g., C32')
+    parser.add_argument('--no_print', action='store_true')
     # 引数を増やしたい時は
     # parser.add_argument('arg3')
     args = parser.parse_args()
@@ -135,4 +137,10 @@ if __name__ == "__main__":
     b_prefix = args.Bb_prefix
     c_prefix = args.C_prefix
 
-    main(a_prefix, b_prefix, c_prefix)
+    if args.no_print:
+        # --no_printが渡された時はprint文を機能させない
+        with redirect_stdout(open(os.devnull, 'w')):
+            main(a_prefix, b_prefix, c_prefix)
+
+    else:
+        main(a_prefix, b_prefix, c_prefix)
