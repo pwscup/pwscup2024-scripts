@@ -6,8 +6,8 @@ dir=$(dirname $0)
 # ヘルプメッセージの関数
 show_help() {
     echo "Usage: $0 --id <ID>"
-    echo "ID must be a two-digit number."
-    echo "--help or -h to show this help message."
+    echo "ID は2桁の数字です."
+    echo "サンプル匿名化では、data/input/B<ID>.csvを加工します。B<ID>.csvファイルを配置してください"
 }
 
 # パラメータがない場合、またはヘルプが要求された場合
@@ -42,7 +42,7 @@ echo "2. 匿名加工を実行"
 for i in {0..9}
 do
     echo "_${i}のファイルを加工中..."
-    python3 ${dir}/scripts/anonymize/anonymize.py ${dir}/data/input/B${id}_$i.csv ${dir}/data/output/C${id}_$i.csv
+    python3 ${dir}/scripts/anonymize/anonymize.py ${dir}/data/input/B${id}_$i.csv --output ${dir}/data/output/
     echo "_${i}のファイルを加工完了"
 done
 
