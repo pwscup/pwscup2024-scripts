@@ -6,8 +6,8 @@ dir=$(dirname $0)
 # ヘルプメッセージの関数
 show_help() {
     echo "Usage: $0 --id <ID>"
-    echo "ID must be a two-digit number."
-    echo "--help or -h to show this help message."
+    echo "ID は2桁の数字です."
+    echo "サンプル匿名化では、data/input/B<ID>.csvを加工します。B<ID>.csvファイルを配置してください"
 }
 
 # パラメータがない場合、またはヘルプが要求された場合
