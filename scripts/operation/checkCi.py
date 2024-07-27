@@ -10,11 +10,19 @@
 import argparse
 import os
 import sys
+import re
 
 import pandas as pd
 from tqdm import tqdm
 
 valid_num_rows = 10000
+
+def check_file2_name_format(file2_basename):
+    # 正規表現パターン：Cから始まり、2桁の数字が続き、_の後に1桁の数字、そして.csvで終わる
+    pattern = r'^C\d{2}_\d\.csv$'
+    if not re.match(pattern, file2_basename):
+        return False
+    return True
 
 def check_csv_file(file1, file2):
     # CSVファイルの存在確認
@@ -24,6 +32,11 @@ def check_csv_file(file1, file2):
     if not os.path.exists(file2):
         print(f"エラー: ファイル '{file2}' が存在しません")
         return False, [f"ファイル '{file2}' が存在しません"]
+
+    # file2のフォーマット確認
+    if not check_file2_name_format(os.path.basename(file2)):
+        print(f"エラー: ファイル '{file2}' のフォーマットが正しくありません")
+        return False, [f"ファイル '{file2}' のフォーマットが正しくありません"]
 
     # CSVファイルを読み込む
     df1 = pd.read_csv(file1)
