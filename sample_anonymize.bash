@@ -42,7 +42,7 @@ echo "2. 匿名加工を実行"
 for i in {0..9}
 do
     echo "_${i}のファイルを加工中..."
-    python3 ${dir}/scripts/anonymize/anonymize.py ${dir}/data/input/B${id}_$i.csv ${dir}/data/output/C${id}_$i.csv
+    python3 ${dir}/scripts/anonymize/anonymize.py ${dir}/data/input/B${id}_$i.csv --output ${dir}/data/output/
     echo "_${i}のファイルを加工完了"
 done
 
