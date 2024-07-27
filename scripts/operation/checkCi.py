@@ -35,8 +35,8 @@ def check_csv_file(file1, file2):
 
     # file2のフォーマット確認
     if not check_file2_name_format(os.path.basename(file2)):
-        print(f"エラー: ファイル '{file2}' のフォーマットが正しくありません")
-        return False, [f"ファイル '{file2}' のフォーマットが正しくありません"]
+        print(f"エラー: ファイル '{file2}' の名前のフォーマットが正しくありません")
+        return False, [f"ファイル '{file2}' の名前のフォーマットが正しくありません"]
 
     # CSVファイルを読み込む
     df1 = pd.read_csv(file1)
