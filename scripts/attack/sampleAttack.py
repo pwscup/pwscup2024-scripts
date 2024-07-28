@@ -1,6 +1,8 @@
 """
+
 攻撃プログラムのサンプルです。サンプル匿名性の評価にも使っています。
 ID32を攻撃したい際は、B32a.csv, B32b.csv, C32_0.csv ~ C32_9.csvが配置されているフォルダで実行してください。
+
 """
 
 import sys
@@ -11,6 +13,7 @@ from contextlib import redirect_stdout
 import pandas as pd
 import numpy as np
 from joblib import Parallel, delayed
+from tqdm import tqdm  # 進捗バー表示のためのライブラリ
 
 # ハミング距離を計算する関数
 def hamming_distance(s1, s2):
@@ -107,7 +110,7 @@ def main(a_prefix, b_prefix, c_prefix, parallel):
     a_combined = a.apply(lambda row: ''.join(row.astype(str)), axis=1).values
 
     # 並列処理を使用して各b.csvの行に対する最小のハミング距離を計算
-    results = Parallel(n_jobs=parallel)(delayed(find_min_distance)(b_row, a_combined, T, b_index) for b_index, b_row in b.iterrows())
+    results = Parallel(n_jobs=parallel)(delayed(find_min_distance)(b_row, a_combined, T, b_index) for b_index, b_row in tqdm(b.iterrows(), total=len(b), desc="計算中"))
 
     # 結果を整理して出力
     min_indices, filled_values, _, distances = zip(*results)
@@ -153,4 +156,3 @@ if __name__ == "__main__":
             main(a_prefix, b_prefix, c_prefix, args.parallel)
     else:
         main(a_prefix, b_prefix, c_prefix, args.parallel)
-
