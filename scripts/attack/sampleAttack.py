@@ -10,6 +10,7 @@ from contextlib import redirect_stdout
 
 import pandas as pd
 import numpy as np
+from joblib import Parallel, delayed
 
 # ハミング距離を計算する関数
 def hamming_distance(s1, s2):
@@ -25,10 +26,35 @@ def fill_placeholders(row, T_row, columns):
     row_filled = row.copy()
     for col in columns:
         if row[col] == '*':
-            return T_row[col]
+            row_filled[col] = T_row[col]
+    return row_filled
+
+# b_rowに対する最小のハミング距離を計算する関数
+def find_min_distance(b_row, a_combined, T, b_index):
+    min_distance = float('inf')
+    min_index = -1
+    ii = -1
+    b_str = ''.join(b_row.astype(str))
+
+    for a_index, a_str in enumerate(a_combined):
+        combined_str = a_str + b_str
+
+        i = 0
+        for t_row in T.itertuples(index=False, name=None):
+            t_str = ''.join(map(str, t_row))
+            distance = hamming_distance(combined_str, t_str)
+            if distance < min_distance:
+                min_distance = distance
+                min_index = a_index
+                ii = i
+            i += 1
+
+    T_row = T.iloc[ii]
+    filled_row = fill_placeholders(b_row, T_row, b_row.index)
+    return min_index, ''.join(filled_row.astype(str)), b_index, min_distance
 
 # メインの処理
-def main(a_prefix, b_prefix, c_prefix):
+def main(a_prefix, b_prefix, c_prefix, parallel):
     # ファイルの読み込み
     a_file = f'{a_prefix}.csv'
     b_file = f'{b_prefix}.csv'
@@ -80,48 +106,27 @@ def main(a_prefix, b_prefix, c_prefix):
     # a.csv の各行を連結
     a_combined = a.apply(lambda row: ''.join(row.astype(str)), axis=1).values
 
-    # 最小のハミング距離を持つ a.csv の行番号を格納するリスト
-    min_indices = []
-    filled_values = []
+    # 並列処理を使用して各b.csvの行に対する最小のハミング距離を計算
+    results = Parallel(n_jobs=parallel)(delayed(find_min_distance)(b_row, a_combined, T, b_index) for b_index, b_row in b.iterrows())
 
-    # b.csv の各行について、最小のハミング距離を持つ a.csv の行番号を計算
-    for b_index, b_row in b.iterrows():
-        min_distance = float('inf')
-        min_index = -1
-        b_str = ''.join(b_row.astype(str))
+    # 結果を整理して出力
+    min_indices, filled_values, _, distances = zip(*results)
 
-        for a_index, a_str in enumerate(a_combined):
-            combined_str = a_str + b_str
-
-            i = 0
-            for t_row in T.itertuples(index=False, name=None):
-                t_str = ''.join(map(str, t_row))
-                distance = hamming_distance(combined_str, t_str)
-                if distance < min_distance:
-                    min_distance = distance
-                    min_index = a_index
-                    ii = i
-                i = i + 1
-
-        # 最小のハミング距離だったTの行から*の位置の値を取得
-        T_row = T.iloc[ii]
-        filled_row = fill_placeholders(b_row, T_row, b_row.index)
-        filled_values.append(''.join(filled_row.astype(str)))
-        min_indices.append(min_index)
-
-        print(f'For b.csv row {b_index}, minimum Hamming distance is at a.csv row {min_index}')
-
-    # 最小のハミング距離を持つ行番号をcsvファイルとして出力
     output_df = pd.DataFrame({
         'a_index': min_indices,
         'filled_values': filled_values
     })
     output_df.to_csv('E.csv', index=False, header=None)
 
+    # 安全性スコアの算出と表示
+    avg_distance = np.mean(distances)
+    print(f'安全性スコア (平均ハミング距離): {avg_distance}')
+
 if __name__ == "__main__":
     # コマンドライン引数を読みこむ
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--id', type=str, help='ID for the prefixes (e.g., 32 for B32a, B32b, C32)')
+    parser.add_argument('--parallel', type=int, default=1, help='Number of parallel jobs (default: 1)')
     parser.add_argument('Ba_prefix', nargs='?', help='e.g., B32a', default=None)
     parser.add_argument('Bb_prefix', nargs='?', help='e.g., B32b', default=None)
     parser.add_argument('C_prefix', nargs='?', help='e.g., C32', default=None)
@@ -145,6 +150,7 @@ if __name__ == "__main__":
     # --no_print オプションが指定された場合に標準出力を無効化
     if args.no_print:
         with redirect_stdout(open(os.devnull, 'w')):
-            main(a_prefix, b_prefix, c_prefix)
+            main(a_prefix, b_prefix, c_prefix, args.parallel)
     else:
-        main(a_prefix, b_prefix, c_prefix)
+        main(a_prefix, b_prefix, c_prefix, args.parallel)
+
