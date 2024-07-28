@@ -89,22 +89,29 @@ mkdir -p $temp_dir
 cp ${dir}/data/input/B${id}.csv $temp_dir
 cp ${dir}/data/output/C${id}_*.csv $temp_dir
 
-# 5.3 サブシェルで、作業用一時ディレクトリに移動して、python3 ${dir}/scripts/operation/maketest.py B${id}を実行
+# 5.3 作業用一時ディレクトリに移動して、python3 ${dir}/scripts/operation/maketest.py B${id}を実行
 (
     cd $temp_dir
     echo "作業用一時ディレクトリでmaketest.pyを実行中..."
     python3 ../../scripts/operation/maketest.py B${id}
 )
 
-# 5.4 そのまま、python3 ${dir}/scripts/attack/sampleAttack.py --id ${id} --parallel $parallel を実行
+# 5.4 python3 ${dir}/scripts/attack/sampleAttack.py --id ${id} を実行
 (
     cd $temp_dir
     echo "作業用一時ディレクトリでsampleAttack.pyを実行中..."
-    python3 ../../scripts/attack/sampleAttack.py --id ${id} --parallel $parallel
+    python3 ../../scripts/attack/sampleAttack.py --id ${id}
+)
+
+# 5.5 そのまま、python3 ${dir}/scripts/operation/answerCheck.py B${id}x E を実行
+(
+    cd $temp_dir
+    echo "安全性評価：個人特定攻撃とDB再構築攻撃の成功数(??/100)を集計中..."
+    python3 ../../scripts/operation/answerCheck.py B${id}x E
 )
 
 # 作業用一時ディレクトリの削除（必要に応じてコメントアウト）
 rm -rf $temp_dir
 
-echo "安全性スコアの計算完了"
+echo "サンプル加工の実行を完了"
 
