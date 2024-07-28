@@ -7,7 +7,7 @@ dir=$(dirname $0)
 show_help() {
     echo "Usage: $0 --id <ID> [--parallel <number_of_parallel_jobs>]"
     echo "ID は2桁の数字です."
-    echo "サンプル匿名化では、data/input/B<ID>.csvを加工します。B<ID>.csvファイルを配置してください"
+    echo "サンプル匿名化では、data/input/B<ID>.csvを加工します。B<ID>.csvファイルをdata/input/に配置してください"
 }
 
 # デフォルト値の設定
