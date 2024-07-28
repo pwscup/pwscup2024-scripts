@@ -1,33 +1,35 @@
 """
-
 攻撃プログラムのサンプルです。サンプル匿名性の評価にも使っています。
 ID32を攻撃したい際は、B32a.csv, B32b.csv, C32_0.csv ~ C32_9.csvが配置されているフォルダで実行してください。
-
 """
 
 import sys
 import os
 import argparse
+from contextlib import redirect_stdout
 
 import pandas as pd
 import numpy as np
 
-
+# ハミング距離を計算する関数
 def hamming_distance(s1, s2):
     return sum(el1 != el2 for el1, el2 in zip(s1, s2))
 
+# 指定された列のみを読み込む関数
 def read_columns(file, cols):
     df = pd.read_csv(file)
     return df[cols]
 
+# `*`の場所をTの対応する値で置き換える関数
 def fill_placeholders(row, T_row, columns):
-    # `*`の場所をTの対応する値で置き換え
     row_filled = row.copy()
     for col in columns:
         if row[col] == '*':
             return T_row[col]
 
+# メインの処理
 def main(a_prefix, b_prefix, c_prefix):
+    # ファイルの読み込み
     a_file = f'{a_prefix}.csv'
     b_file = f'{b_prefix}.csv'
     a = pd.read_csv(a_file)
@@ -75,9 +77,6 @@ def main(a_prefix, b_prefix, c_prefix):
     # Tの列を指定された順に並べ替え
     T = T[final_columns]
 
-    # Tをcsvファイルとして出力
-#    T.to_csv('output_T.csv', index=False)
-
     # a.csv の各行を連結
     a_combined = a.apply(lambda row: ''.join(row.astype(str)), axis=1).values
 
@@ -94,21 +93,19 @@ def main(a_prefix, b_prefix, c_prefix):
         for a_index, a_str in enumerate(a_combined):
             combined_str = a_str + b_str
 
-            i=0
+            i = 0
             for t_row in T.itertuples(index=False, name=None):
                 t_str = ''.join(map(str, t_row))
                 distance = hamming_distance(combined_str, t_str)
                 if distance < min_distance:
                     min_distance = distance
                     min_index = a_index
-                    ii=i
-                i=i+1
+                    ii = i
+                i = i + 1
 
         # 最小のハミング距離だったTの行から*の位置の値を取得
-#        T_row = T.iloc[min_index]
         T_row = T.iloc[ii]
         filled_row = fill_placeholders(b_row, T_row, b_row.index)
-#        filled_row = fill_placeholders(b_row, best_t_row, b_row.index)
         filled_values.append(''.join(filled_row.astype(str)))
         min_indices.append(min_index)
 
@@ -124,15 +121,30 @@ def main(a_prefix, b_prefix, c_prefix):
 if __name__ == "__main__":
     # コマンドライン引数を読みこむ
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('Ba_prefix', help='e.g., B32a')
-    parser.add_argument('Bb_prefix', help='e.g., B32b')
-    parser.add_argument('C_prefix', help='e.g., C32')
-    # 引数を増やしたい時は
-    # parser.add_argument('arg3')
+    parser.add_argument('--id', type=str, help='ID for the prefixes (e.g., 32 for B32a, B32b, C32)')
+    parser.add_argument('Ba_prefix', nargs='?', help='e.g., B32a', default=None)
+    parser.add_argument('Bb_prefix', nargs='?', help='e.g., B32b', default=None)
+    parser.add_argument('C_prefix', nargs='?', help='e.g., C32', default=None)
+    parser.add_argument('--no_print', action='store_true')
+
     args = parser.parse_args()
 
-    a_prefix = args.Ba_prefix
-    b_prefix = args.Bb_prefix
-    c_prefix = args.C_prefix
+    # --id オプションが指定された場合にプレフィックスを設定
+    if args.id:
+        a_prefix = f'B{args.id}a'
+        b_prefix = f'B{args.id}b'
+        c_prefix = f'C{args.id}'
+    else:
+        if args.Ba_prefix is None or args.Bb_prefix is None or args.C_prefix is None:
+            print("Error: When --id is not specified, Ba_prefix, Bb_prefix, and C_prefix must be provided.")
+            sys.exit(1)
+        a_prefix = args.Ba_prefix
+        b_prefix = args.Bb_prefix
+        c_prefix = args.C_prefix
 
-    main(a_prefix, b_prefix, c_prefix)
+    # --no_print オプションが指定された場合に標準出力を無効化
+    if args.no_print:
+        with redirect_stdout(open(os.devnull, 'w')):
+            main(a_prefix, b_prefix, c_prefix)
+    else:
+        main(a_prefix, b_prefix, c_prefix)
