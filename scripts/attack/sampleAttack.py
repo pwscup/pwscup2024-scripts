@@ -1,3 +1,8 @@
+"""
+攻撃プログラムのサンプルです。サンプル匿名性の評価にも使っています。
+ID32を攻撃したい際は、B32a.csv, B32b.csv, C32_0.csv ~ C32_9.csvが配置されているフォルダで実行してください。
+"""
+
 import sys
 import os
 import argparse
