@@ -117,9 +117,9 @@ if __name__ == "__main__":
     # コマンドライン引数を読みこむ
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--id', type=int, help='ID for the prefixes (e.g., 32 for B32a, B32b, C32)')
-    parser.add_argument('Ba_prefix', nargs='?', help='e.g., B32a')
-    parser.add_argument('Bb_prefix', nargs='?', help='e.g., B32b')
-    parser.add_argument('C_prefix', nargs='?', help='e.g., C32')
+    parser.add_argument('Ba_prefix', nargs='?', help='e.g., B32a', default=None)
+    parser.add_argument('Bb_prefix', nargs='?', help='e.g., B32b', default=None)
+    parser.add_argument('C_prefix', nargs='?', help='e.g., C32', default=None)
     parser.add_argument('--no_print', action='store_true')
 
     args = parser.parse_args()
@@ -130,6 +130,9 @@ if __name__ == "__main__":
         b_prefix = f'B{args.id}b'
         c_prefix = f'C{args.id}'
     else:
+        if args.Ba_prefix is None or args.Bb_prefix is None or args.C_prefix is None:
+            print("Error: When --id is not specified, Ba_prefix, Bb_prefix, and C_prefix must be provided.")
+            sys.exit(1)
         a_prefix = args.Ba_prefix
         b_prefix = args.Bb_prefix
         c_prefix = args.C_prefix
