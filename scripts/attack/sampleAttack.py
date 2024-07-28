@@ -121,7 +121,7 @@ def main(a_prefix, b_prefix, c_prefix):
 if __name__ == "__main__":
     # コマンドライン引数を読みこむ
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--id', type=int, help='ID for the prefixes (e.g., 32 for B32a, B32b, C32)')
+    parser.add_argument('--id', type=str, help='ID for the prefixes (e.g., 32 for B32a, B32b, C32)')
     parser.add_argument('Ba_prefix', nargs='?', help='e.g., B32a', default=None)
     parser.add_argument('Bb_prefix', nargs='?', help='e.g., B32b', default=None)
     parser.add_argument('C_prefix', nargs='?', help='e.g., C32', default=None)
