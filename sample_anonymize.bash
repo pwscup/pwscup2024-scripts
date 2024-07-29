@@ -8,13 +8,14 @@ set -e
 
 # ヘルプメッセージの関数
 show_help() {
-    echo "Usage: $0 --id <ID> [--parallel <number_of_parallel_jobs>]"
+    echo "Usage: $0 --id <ID> [--anonymize_script <path_to_anonymize_script>] [--parallel <number_of_parallel_jobs>]"
     echo "ID は2桁の数字です."
     echo "サンプル匿名化では、data/input/B<ID>.csvを加工します。B<ID>.csvファイルをdata/input/に配置してください"
 }
 
 # デフォルト値の設定
 parallel=1
+anonymize_script="${dir}/scripts/anonymize/anonymize.py"
 
 # パラメータがない場合、またはヘルプが要求された場合
 if [ "$#" -eq 0 ] || [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
@@ -27,7 +28,7 @@ if [ "$1" == "--id" ] && [[ "$2" =~ ^[0-9]{2}$ ]]; then
     id=$2
     shift 2
 else
-    echo "Error: Invalid or missing ID argument."
+    echo "エラー: 無効または不足しているID引数."
     show_help
     exit 1
 fi
@@ -43,13 +44,24 @@ case $key in
     shift # オプションの値をスキップ
     shift # オプション自体をスキップ
     ;;
+    --anonymize_script)
+    anonymize_script="$2"
+    shift # オプションの値をスキップ
+    shift # オプション自体をスキップ
+    ;;
     *)
-    echo "Error: Invalid argument $1"
+    echo "エラー: 無効な引数 $1"
     show_help
     exit 1
     ;;
 esac
 done
+
+# anonymize_scriptの存在確認
+if [ ! -f "$anonymize_script" ]; then
+    echo "エラー: 指定された匿名化スクリプトファイル '$anonymize_script' が存在しません."
+    exit 1
+fi
 
 # Step 0: ハッシュ値の確認
 echo "0. ハッシュ値の確認"
@@ -64,7 +76,7 @@ echo "2. 匿名加工を実行"
 for i in {0..9}
 do
     echo "_${i}のファイルを加工中..."
-    python3 ${dir}/scripts/anonymize/anonymize.py ${dir}/data/input/B${id}_$i.csv --output ${dir}/data/output/
+    python3 $anonymize_script ${dir}/data/input/B${id}_$i.csv --output ${dir}/data/output/
     echo "_${i}のファイルを加工完了"
 done
 
@@ -117,4 +129,3 @@ cp ${dir}/data/output/C${id}_*.csv $temp_dir
 rm -rf $temp_dir
 
 echo "サンプル加工の実行を完了"
-
