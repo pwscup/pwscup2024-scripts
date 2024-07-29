@@ -56,6 +56,12 @@ pwscup2024-dev/
 
 各Pythonスクリプトはコマンドラインで実行する際にオプション引数-hをつけて実行すると簡単な説明をコマンドラインに出力するようにしています。
 
+注意: サンプルプログラムのいくつかはB32.csvやB32_3.csvのようなB<チームid>.csvやB<チームid>_3.csvのようなファイル名が配布データに付けられていることを想定して作られています。
+一方で、メールで送付された配布データはBi98.csvのようにBi<チームIDと無関係な通し番号>.csvのような形式になっています。
+ハッシュ値の確認以降は配布データの名前を変更することを推奨します。
+詳しくはコンテストページ(https://www.codabench.org/competitions/3262/ )のHow to anonymizeタブから確認してください。
+
+
 ### 配布データチェックスクリプト
 
 `./scripts/operation/checkhashvalue.py` 配布データのハッシュ値を確認します。以下のコマンドで実行します：
@@ -90,20 +96,20 @@ python3 ./scripts/operation/checkhashvalue.py -h
 以下のコマンドで実行します:
 
 ```bash
-python3 ./scripts/operation/split.py <配布データ.csv>
+python3 ./scripts/operation/split.py <配布データのprefix>
 ```
 
-例えば、配布データがBi98.csvだった場合、次のように使ってください:
+例えば、./data/input/B32.csvを分割したい場合、次のように使ってください:
 
 ```bash
-python3 ./scripts/operation/split.py Bi98.csv
+python3 ./scripts/operation/split.py ./data/input/B32
 ```
 
-この例の場合、Bi98.csvと同じディレクトリにBi98_0.csv ~ Bi98_9.csvが保存されます。
+この例の場合、B32.csvと同じディレクトリにB32_0.csv ~ B32_9.csvが保存されます。
 
 ### 匿名化の個別実行のサンプル
 
-`scripts/anonymize/anonymize.py` は、./data/input/Bi98_1.csvのような匿名化前データのパスを引数として渡して、データを匿名化するためのサンプルスクリプトです。
+`scripts/anonymize/anonymize.py` は、./data/input/B32_1.csvのような匿名化前データのパスを引数として渡して、データを匿名化するためのサンプルスクリプトです。
 参加者はこのスクリプトの一部を書き換えて匿名化ファイルを作ることができます。
 採点は提出されたcsvファイルに対して実施するので、csvファイルが正しく作れてさえいればこのサンプルスクリプトを元にしたプログラムを使っていなくても問題ありません。
 
@@ -116,20 +122,20 @@ python3 scripts/anonymize/anonymize.py <入力ファイルパス>
 具体例: 
 
 ```bash
-python3 scripts/anonymize/anonymize.py ./data/input/Bi98_1.csv 
+python3 scripts/anonymize/anonymize.py ./data/input/B32_1.csv 
 ```
 
-この例では匿名化ファイルを`./data/input/Ci98_1.csv`に書き出します。
+この例では匿名化ファイルを`./data/input/C32_1.csv`に書き出します。
 
 匿名化ファイルを配布データと同じディレクトリに保存したくない場合は`--output`または`-o`を使って保存先を指定することもできます:
 
 ```bash
-python3 scripts/anonymize/anonymize.py ./data/input/Bi98_1.csv --output ./data/output/
+python3 scripts/anonymize/anonymize.py ./data/input/B32_1.csv --output ./data/output/
 ```
 
-注意: この例では、分割後のファイルBi98_1.csvから匿名化ファイルC98i_1.csvを作ることを想定して説明しましたが、参加者がこの方法にこだわる必要はありません。
-分割前の配布データBi98.csvを匿名化して、それを分割してCi98_0.csv ~ Ci98_9.csvを作っても構いません。
-どんな方法を使ったとしても、Ci98_0.csv ~ Ci98_9.csvに相当するcsvファイルを事務局が指定するフォーマットで準備できれば採点対象になります。
+注意: この例では、分割後のファイルB32_1.csvから匿名化ファイルC32_1.csvを作ることを想定して説明しましたが、参加者がこの方法にこだわる必要はありません。
+分割前の配布データB32.csvを匿名化して、それを分割してC32_0.csv ~ C32_9.csvを作っても構いません。
+どんな方法を使ったとしても、C32_0.csv ~ C32_9.csvに相当するcsvファイルを事務局が指定するフォーマットで準備できれば採点対象になります。
 
 ### 匿名化データチェックスクリプト
 
@@ -148,7 +154,7 @@ python3 ./scripts/operation/checkCi.py <入力ファイルパス> <出力ファ�
 具体例:
 
 ```bash
-python3 ./scripts/operation/checkCi.py ./data/input/Bi98_3.csv ./data/output/Ci98_3.csv
+python3 ./scripts/operation/checkCi.py ./data/input/B32_3.csv ./data/output/C32_3.csv
 ```
 
 ### 有用性個別評価スクリプト
@@ -163,14 +169,14 @@ python3 ./scripts/evaluate/utilityScoreSingle.py <分割された配布データ
 具体例: 
 
 ```bash
-python3 ./scripts/evaluate/utilityScoreSingle.py ./data/input/Bi98_3.csv ./data/output/Ci98_3.csv
+python3 ./scripts/evaluate/utilityScoreSingle.py ./data/input/B32_3.csv ./data/output/C32_3.csv
 ```
 
 `--parallel`で並列処理スレッド数を指定すると評価時間が短くなる可能性があります。使用するコンピュータに依存するので、実行時間があまり変わらない場合もあります。
 使用例:
 
 ```bash
-python3 ./scripts/evaluate/utilityScoreSingle.py ./data/input/Bi98_3.csv ./data/output/Ci98_3.csv --parallel 4
+python3 ./scripts/evaluate/utilityScoreSingle.py ./data/input/B32_3.csv ./data/output/C32_3.csv --parallel 4
 ```
 
 ### 有用性一括評価スクリプト
@@ -180,7 +186,7 @@ python3 ./scripts/evaluate/utilityScoreSingle.py ./data/input/Bi98_3.csv ./data/
 2つの実行方法を用意しました。
 
 (実行方法1) `.`に`id.txt`というテキストファイルを配置して、そこにidを書き込んでください。例えば、`98`。
-分割された配布データ群(例: Bi98_0.csv ~ Bi98_9.csv)と匿名化ファイル群(Ci98_0.csv ~ Ci98_9.csv)も同じディレクトリに配置してください。
+分割された配布データ群(例: B32_0.csv ~ B32_9.csv)と匿名化ファイル群(C32_0.csv ~ C32_9.csv)も同じディレクトリに配置してください。
 その後、以下のコマンドで実行します:
 
 ```bash
@@ -191,7 +197,7 @@ python3 ./scripts/evaluate/utilityScoreSingle.py
 (`id.txt`は不要)。具体例:
 
 ```bash
-python3 ./scripts/evaluate/utilityScoreSingle.py --id 98 --input ./data/input --output ./data/output
+python3 ./scripts/evaluate/utilityScoreSingle.py --id 32 --input ./data/input --output ./data/output
 ```
 
 また、このスクリプトも`--parallel`で並列化処理スレッド数を指定できます。
