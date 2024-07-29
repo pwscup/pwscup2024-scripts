@@ -3,6 +3,9 @@
 # スクリプトファイルのディレクトリを取得
 dir=$(dirname $0)
 
+# エラーが発生したら停止
+set -e
+
 # ヘルプメッセージの関数
 show_help() {
     echo "Usage: $0 --id <ID> [--parallel <number_of_parallel_jobs>]"
