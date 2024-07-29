@@ -31,13 +31,15 @@ pwscup2024-dev/
 ├── data/　　　：データ置き場
 │   ├── raw/
 │   │   └── A.csv
+│   ├── input/　：匿名化対象ファイル(B)置き場
+│   │   └── (省略)
 │   ├── output/　：匿名化後ファイル(C)置き場
 │   │   └── sampleC.csv
-│   └── sample/　：匿名化前ファイル(B)置き場
+│   └── sample/　：サンプルの匿名化前ファイル(B)置き場
 │       └── sampleBi.csv
 ├── scripts/　　　：スクリプト置き場
 │   ├── anonymize/：加工スクリプト
-│   │   └── anonymize.py            ：(匿名化フェーズ) 匿名化スクリプト
+│   │   └── anonymize.py            ：(匿名化フェーズ) サンプル匿名化スクリプト
 │   ├── evaluate/：評価スクリプト
 │   │   ├── utilityScore.py         ：(匿名化フェーズ) 有用性評価スクリプト 0-9まで全てを一括で評価する
 │   │   └── utilityScoreSingle.py   ：(匿名化フェーズ) 有用性評価スクリプト 単体の評価
