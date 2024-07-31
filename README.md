@@ -63,6 +63,22 @@ pwscup2024-dev/
 ハッシュ値の確認以降は配布データの名前を変更することを推奨します。
 詳しくはコンテストページ(https://www.codabench.org/competitions/3262/ )のHow to anonymizeタブから確認してください。
 
+### 匿名化と評価の一括実行
+
+```data/input/B00.csv``` のように、```data/input```にBファイルがある前提で、
+
+```bash
+bash sample_anonymize.bash --id 00
+```
+
+などとして、idを指定すると、サンプル加工スクリプトにより、配布データチェック・匿名化・匿名化データの形式チェック、有用性評価、サンプル匿名性評価、が一括して実行されます。
+
+また、自作の匿名化スクリプトを作成した場合は、
+```bash
+bash sample_anonymize.bash --id 00 --anonymize_script /file/path/to/my_anonymize.py
+```
+などとして、--anonymize_scriptオプションにてスクリプトのパスを指定すると、自作の匿名化スクリプトを用いて、一括実行が走ります。
+
 
 ### 配布データチェックスクリプト
 
@@ -207,13 +223,6 @@ python3 ./scripts/evaluate/utilityScoreSingle.py --id 32 --input ./data/input --
 注意: 
 - このスクリプトを実行してもcodaBenchへの匿名化ファイルの提出は行われません。CodaBenchへの提出は別途必要です。
 - チームの有用性評価値は、```_0```から```_9```までの10ファイルの評価値から定めます（[ルール資料](https://www.iwsec.org/pws/2024/cup24.html#%E5%8F%82%E5%8A%A0%E8%80%85%E5%90%91%E3%81%91%E8%B3%87%E6%96%99:~:text=%E6%B1%BA%E5%AE%9A%E3%81%97%E3%81%BE%E3%81%99%E3%80%82-,%E5%8F%82%E5%8A%A0%E8%80%85%E5%90%91%E3%81%91%E8%B3%87%E6%96%99,-PWSCup2024%EF%BC%86iPWSCup2024%20%E3%83%AB%E3%83%BC%E3%83%AB)【匿名化フェーズ】 有用性とサンプル匿名性を参照）
-
-### 匿名化と評価の一括実行
-
-```bash
-bash sample_anonymize.bash --id 00
-```
-などとして、idを指定すると、サンプル加工スクリプトによる加工と評価が実行されます。
 
 ## 環境構築
 
