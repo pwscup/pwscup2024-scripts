@@ -42,7 +42,7 @@ def find_max_mae_and_columns(file1, file2, parallel=1):
       column_pair = [c1, c2]
       freq1 = df1.value_counts(column_pair)
       freq2 = df2.value_counts(column_pair)
-      err_dic[",".join(column_pair)] = (freq1 - freq2).abs().mean()
+      err_dic[",".join(column_pair)] = (freq1 - freq2).abs().sum()
 
     # MAEの規格化
     max_mae_columns, max_mae = max(err_dic.items(), key=lambda x: x[1])
