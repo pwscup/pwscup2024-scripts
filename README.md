@@ -19,6 +19,8 @@
   - [匿名化データチェックスクリプト](#匿名化データチェックスクリプト)
   - [有用性評価スクリプト(個別)](#有用性個別評価スクリプト)
   - [有用性評価スクリプト(一括)](#有用性一括評価スクリプト)
+  - [攻撃のサンプル](#攻撃のサンプル)
+  - [匿名スコア評価スクリプト](#匿名スコア評価スクリプト)
 - [環境構築](#環境構築)
 - [その他](#その他)
 
@@ -223,6 +225,45 @@ python3 ./scripts/evaluate/utilityScoreSingle.py --id 32 --input ./data/input --
 注意: 
 - このスクリプトを実行してもcodaBenchへの匿名化ファイルの提出は行われません。CodaBenchへの提出は別途必要です。
 - チームの有用性評価値は、```_0```から```_9```までの10ファイルの評価値から定めます（[ルール資料](https://www.iwsec.org/pws/2024/cup24.html#%E5%8F%82%E5%8A%A0%E8%80%85%E5%90%91%E3%81%91%E8%B3%87%E6%96%99:~:text=%E6%B1%BA%E5%AE%9A%E3%81%97%E3%81%BE%E3%81%99%E3%80%82-,%E5%8F%82%E5%8A%A0%E8%80%85%E5%90%91%E3%81%91%E8%B3%87%E6%96%99,-PWSCup2024%EF%BC%86iPWSCup2024%20%E3%83%AB%E3%83%BC%E3%83%AB)【匿名化フェーズ】 有用性とサンプル匿名性を参照）
+
+### 攻撃のサンプル
+
+`scripts/attack/sampleAttack.py`攻撃のサンプルコードです。サンプル匿名性の計算に使っている攻撃方法でもあります。
+2種類の実行方法を用意しました。
+
+(実行方法1) 以下のコマンドで実行します:
+```bash
+python scripts/attack/sampleAttack.py <Ba_prefix> <Bb_prefix> <C_prefix>
+```
+具体例:
+```bash
+python scripts/attack/sampleAttack.py data/input/B32a data/input/B32b data/output/C32
+```
+実行の経過を出力しながら攻撃を行います。
+実行後、攻撃結果E.csvがコマンドを実行したディレクトリに保存されます。
+
+(実行方法2) コマンドを実行するディレクトリに攻撃用ファイル群(e.g., B32a.csvとB32b.csv)と匿名化ファイル群(e.g., C32_0.csv ~ C32_9.csv)を配置した後、以下のコマンドで実行します:
+```bash
+python scripts/attack/sampleAttack.py --id <id>
+```
+具体例:
+```bash
+python scripts/attack/sampleAttack.py --id 32
+```
+
+いずれの実行方法でも`--no_print`をコマンドに追加すると実行経過を出力しません。攻撃結果E.csvの保存だけを行います。
+
+### 匿名スコア評価スクリプト
+
+`scripts/operation/answerCheck.py`攻撃結果から攻撃成功数を計算します。
+以下のコマンドで実行します:
+```bash
+python scripts/operation/answerCheck.py <Bx_csv_prefix> <E_csv_prefix>
+```
+具体例:
+```bash
+python scripts/operation/answerCheck.py data/input/B32x E
+```
 
 ## 環境構築
 
