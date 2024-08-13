@@ -94,7 +94,7 @@ def main(a_prefix, b_prefix, c_prefix):
     filled_values = []
 
     # b.csv の各行について、最小のハミング距離を持つ a.csv の行番号を計算
-    for b_index, b_row in tqdm(b.iterrows()):
+    for b_index, b_row in b.iterrows():
         min_distance = float('inf')
         min_index = -1
 
