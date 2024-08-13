@@ -77,8 +77,17 @@ def main(a_prefix, b_prefix, c_prefix):
     # Tの列を指定された順に並べ替え
     T = T[final_columns]
 
-    # a.csv の各行を連結
-    a_combined = a.apply(lambda row: ''.join(row.astype(str)), axis=1).values
+    # 比較のためa,b,Tを文字列型に変換
+    a = a.astype(str)
+    b = b.astype(str)
+    T = T.astype(str)
+
+    # rowとdfを受け取り、rowに対するdfのhamming_distanceの最小値と最小値を取るindexを返す関数
+    def return_min_hamdist_idx(row, df):
+        ham_dist = df.apply(lambda df_row: hamming_distance(row, df_row), axis = 1)
+        min_dist, min_index = ham_dist.min(), ham_dist.idxmin()
+
+        return pd.Series([min_dist, min_index], index=['Dist', 'idx'])
 
     # 最小のハミング距離を持つ a.csv の行番号を格納するリスト
     min_indices = []
@@ -88,25 +97,19 @@ def main(a_prefix, b_prefix, c_prefix):
     for b_index, b_row in b.iterrows():
         min_distance = float('inf')
         min_index = -1
-        b_str = ''.join(b_row.astype(str))
 
-        for a_index, a_str in enumerate(a_combined):
-            combined_str = a_str + b_str
+        # A(基本属性のdf)に対してrating部を全てb_rowの値で代入する(apply用)
+        tmp_a = a.copy()
+        tmp_a[b_row.index] = b_row
 
-            i = 0
-            for t_row in T.itertuples(index=False, name=None):
-                t_str = ''.join(map(str, t_row))
-                distance = hamming_distance(combined_str, t_str)
-                if distance < min_distance:
-                    min_distance = distance
-                    min_index = a_index
-                    ii = i
-                i = i + 1
+        # tmp_aの各行に対して、Tを受け取りhamming_distanceの最小値と最小値を取るindexを返す
+        a_dist_df = tmp_a.apply(lambda row: return_min_hamdist_idx(row, T), axis = 1)
 
-        # 最小のハミング距離だったTの行から*の位置の値を取得
-        T_row = T.iloc[ii]
+        min_index = a_dist_df["Dist"].idxmin()
+        T_row = T.iloc[a_dist_df.loc[min_index, "idx"]]
+
         filled_row = fill_placeholders(b_row, T_row, b_row.index)
-        filled_values.append(''.join(filled_row.astype(str)))
+        filled_values.append(filled_row)
         min_indices.append(min_index)
 
         print(f'For b.csv row {b_index}, minimum Hamming distance is at a.csv row {min_index}')
